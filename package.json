@@ -1,0 +1,28 @@
+{
+  "name": "base-http-proxy",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yuanzhizhu/base-http-proxy.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/yuanzhizhu/base-http-proxy/issues"
+  },
+  "homepage": "https://github.com/yuanzhizhu/base-http-proxy#readme",
+  "dependencies": {
+    "http-proxy": "^1.18.0",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.3.0",
+    "stream-array": "^1.1.2"
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0"
+  }
+}
