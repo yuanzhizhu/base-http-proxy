@@ -1,14 +1,18 @@
 const Koa = require("koa");
 const bodyParser = require("koa-bodyparser");
 
-const mainStationProxy = require('./middleware/mainStationProxy');
-const youzanyunProxy = require('./middleware/youzanyunProxy');
-
 const app = new Koa();
 
 app.use(bodyParser());
-app.use(mainStationProxy);
-app.use(youzanyunProxy);
+app.use(async (ctx, next) => {
+  const body = ctx.request.body;
+  const { mainstationresponse } = ctx.header;
+  ctx.body = JSON.stringify({
+    body,
+    mainstationresponse
+  })
+  await next();
+});
 
-console.log("启动成功");
-app.listen(80);
+console.log("业务app启动成功");
+app.listen(8080);
