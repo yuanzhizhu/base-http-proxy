@@ -3,12 +3,13 @@ const streamify = require("stream-array");
 
 const proxy = httpProxy.createProxyServer();
 
-const mainStationProxy = async (ctx, next) => {
+const mainStationProxy = ({ target }) => async (ctx, next) => {
   const { mainStationResponse } = ctx;
 
   await new Promise(resolve => {
     proxy.on("proxyRes", proxyRes => {
       var body = [];
+
       proxyRes.on("data", chunk => {
         body.push(chunk);
       });
@@ -22,7 +23,7 @@ const mainStationProxy = async (ctx, next) => {
 
     proxy.web(ctx.req, ctx.res, {
       changeOrigin: true,
-      target: "http://localhost:8080",
+      target,
       selfHandleResponse: true,
       headers: {
         mainStationResponse
