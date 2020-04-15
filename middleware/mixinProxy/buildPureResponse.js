@@ -1,25 +1,25 @@
 const buildPureResponse = ({ headers, body }) => {
   const contentType = headers["content-type"];
 
+  const pureResponse = {
+    headers
+  };
+
   if (/^application\/json/.test(contentType)) {
-    return {
-      headers,
-      result: JSON.parse(body.toString()),
-      base64: false
-    };
+    pureResponse.result = JSON.parse(body.toString());
+    pureResponse.base64 = false;
+  } else if (/^application\/javascript/.test(contentType)) {
+    pureResponse.result = body.toString();
+    pureResponse.base64 = false;
   } else if (/^text\//.test(contentType)) {
-    return {
-      headers,
-      result: body.toString(),
-      base64: false
-    };
+    pureResponse.result = body.toString();
+    pureResponse.base64 = false;
   } else {
-    return {
-      headers,
-      result: body.toString("base64"),
-      base64: true
-    };
+    pureResponse.result = body.toString("base64");
+    pureResponse.base64 = true;
   }
+
+  return pureResponse;
 };
 
 module.exports = buildPureResponse;
