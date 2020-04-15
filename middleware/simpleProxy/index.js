@@ -1,10 +1,13 @@
 const httpProxy = require("http-proxy");
 const streamify = require("stream-array");
-const buildRequestBody = require("./buildRequestBody");
 
 const proxy = httpProxy.createProxyServer();
 
-const serialProxy = ({ target, key, combineKey }) => async (ctx, next) => {
+/**
+ * 简单proxy
+ * 把proxy结果，塞入ctx[key]中
+ */
+const simpleProxy = ({ target, key }) => async (ctx, next) => {
   await new Promise(resolve => {
     proxy.on("proxyRes", proxyRes => {
       let body = [];
@@ -14,24 +17,18 @@ const serialProxy = ({ target, key, combineKey }) => async (ctx, next) => {
       });
 
       proxyRes.on("end", () => {
+        // TODO:toString是否合理？
         body = Buffer.concat(body).toString();
-        // TODO:当前假设body都是String类型
         ctx[key] = body;
         resolve();
       });
     });
 
-    // TODO:假设rawBody都是String类型
     let rawBody = ctx.request.rawBody;
 
-    if (combineKey !== undefined) {
-      const combineResponseBody = ctx[combineKey];
-      rawBody = buildRequestBody(rawBody, combineResponseBody);
-    }
-
     proxy.web(ctx.req, ctx.res, {
-      changeOrigin: true,
       target,
+      changeOrigin: true,
       selfHandleResponse: true,
       buffer: rawBody ? streamify([rawBody]) : undefined
     });
@@ -40,4 +37,4 @@ const serialProxy = ({ target, key, combineKey }) => async (ctx, next) => {
   await next();
 };
 
-module.exports = serialProxy;
+module.exports = simpleProxy;
