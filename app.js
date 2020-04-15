@@ -6,11 +6,7 @@ const app = new Koa();
 app.use(bodyParser());
 app.use(async (ctx, next) => {
   const body = ctx.request.body;
-  const { mainstationresponse } = ctx.header;
-  ctx.body = JSON.stringify({
-    body,
-    mainstationresponse
-  })
+  ctx.body = body;
   await next();
 });
 

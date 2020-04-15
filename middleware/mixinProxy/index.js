@@ -1,35 +1,25 @@
 const httpProxy = require("http-proxy");
 const streamify = require("stream-array");
-const mixinRequestBody = require("./mixinRequestBody");
+const buildPureResponse = require("./buildPureResponse");
+const mixinRequestWithResponse = require("./mixinRequestWithResponse");
 
 const proxy = httpProxy.createProxyServer();
 
 /**
  * 混合代理
  */
-const mixinProxy = ({ target, key, mixingKey }) => async (ctx, next) => {
+const mixinProxy = ({ target, key, mixingKey }) => async ctx => {
+  if (!target) throw new Error("target必传");
+  if (!key) throw new Error("key必传");
   if (!mixingKey) throw new Error("mixingKey必传");
 
-  await new Promise(resolve => {
-    proxy.on("proxyRes", proxyRes => {
-      let body = [];
+  await new Promise(() => {
+    const response = buildPureResponse(ctx[mixingKey]);
 
-      proxyRes.on("data", chunk => {
-        body.push(chunk);
-      });
-
-      proxyRes.on("end", () => {
-        body = Buffer.concat(body).toString();
-        // TODO:当前假设body都是String类型
-        ctx[key] = body;
-        resolve();
-      });
-    });
-
-    // TODO:假设rawBody都是String类型
     const newRequestBody = JSON.stringify(
-      mixinRequestBody(ctx.request.rawBody, ctx[mixingKey])
+      mixinRequestWithResponse(ctx.request.body, response)
     );
+
     const newRequestBodyLen = new Buffer(newRequestBody).length;
 
     // 混合代理，强制把请求变为POST，并且用JSON格式
@@ -42,12 +32,9 @@ const mixinProxy = ({ target, key, mixingKey }) => async (ctx, next) => {
     proxy.web(ctx.req, ctx.res, {
       target,
       changeOrigin: true,
-      selfHandleResponse: true,
       buffer: streamify([newRequestBody])
     });
   });
-
-  await next();
 };
 
 module.exports = mixinProxy;

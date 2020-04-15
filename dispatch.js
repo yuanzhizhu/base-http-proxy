@@ -10,7 +10,7 @@ app.use(bodyParser());
 
 app.use(
   simpleProxy({
-    target: "https://diy.youzanyun.com/",
+    target: "https://qiniu.qingyanjiaoyou.com/",
     key: "mainResText"
   })
 );

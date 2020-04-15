@@ -8,6 +8,9 @@ const proxy = httpProxy.createProxyServer();
  * 把proxy结果，塞入ctx[key]中
  */
 const simpleProxy = ({ target, key }) => async (ctx, next) => {
+  if (!target) throw new Error("target必传");
+  if (!key) throw new Error("key必传");
+
   await new Promise(resolve => {
     proxy.on("proxyRes", proxyRes => {
       let body = [];
@@ -17,9 +20,14 @@ const simpleProxy = ({ target, key }) => async (ctx, next) => {
       });
 
       proxyRes.on("end", () => {
-        // TODO:toString是否合理？
-        body = Buffer.concat(body).toString();
-        ctx[key] = body;
+        const headers = proxyRes.headers;
+        body = Buffer.concat(body);
+
+        ctx[key] = {
+          headers,
+          body
+        };
+
         resolve();
       });
     });
