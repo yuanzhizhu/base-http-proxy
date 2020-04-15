@@ -11,17 +11,21 @@ app.use(bodyParser());
 app.use(
   simpleProxy({
     target: "https://qiniu.qingyanjiaoyou.com/",
-    key: "mainResText"
+    key: "mainRes"
   })
 );
 
 app.use(
   mixinProxy({
     target: "http://localhost:8080",
-    key: "isvResText",
-    mixingKey: "mainResText"
+    key: "isvRes",
+    mixingKeys: "mainRes"
   })
 );
+
+app.use(async (ctx) => {
+  ctx.body = ctx.isvRes.body;
+})
 
 console.log("dispatch启动成功");
 app.listen(80);
