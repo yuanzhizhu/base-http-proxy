@@ -1,6 +1,5 @@
 const httpProxy = require("http-proxy");
 const streamify = require("stream-array");
-const zlib = require("zlib");
 
 const proxy = httpProxy.createProxyServer();
 
@@ -15,15 +14,12 @@ const simpleProxy = ({ target, key }) => async (ctx, next) => {
   await new Promise(resolve => {
     proxy.on("proxyRes", proxyRes => {
       let body = [];
-      const gunzip = zlib.createGunzip();
 
-      proxyRes.pipe(gunzip);
-
-      gunzip.on("data", chunk => {
+      proxyRes.on("data", chunk => {
         body.push(chunk);
       });
 
-      gunzip.on("end", () => {
+      proxyRes.on("end", () => {
         const headers = proxyRes.headers;
         body = Buffer.concat(body);
 
