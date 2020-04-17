@@ -7,13 +7,13 @@ const proxy = httpProxy.createProxyServer();
 /**
  * 混合代理
  */
-const mixinProxy = ({ target, key, mixingKeys }) => async (ctx, next) => {
+const mixinProxy = ({ target, key, mixinKeys }) => async (ctx, next) => {
   if (!target) throw new Error("target必传");
   if (!key) throw new Error("key必传");
-  if (!mixingKeys) throw new Error("mixingKeys必传");
+  if (!mixinKeys) throw new Error("mixinKeys必传");
 
-  if (typeof mixingKeys === "string") {
-    mixingKeys = [mixingKeys];
+  if (typeof mixinKeys === "string") {
+    mixinKeys = [mixinKeys];
   }
 
   await new Promise(resolve => {
@@ -41,8 +41,8 @@ const mixinProxy = ({ target, key, mixingKeys }) => async (ctx, next) => {
       requestBody: ctx.request.body
     };
 
-    for (let mixingKey of mixingKeys) {
-      if (!ctx[mixingKey]) throw new Error(`key为${key}的mixinProxy，找不到mixingKeys为${mixingKey}的响应`);
+    for (let mixingKey of mixinKeys) {
+      if (!ctx[mixingKey]) throw new Error(`key为${key}的mixinProxy，找不到mixinKeys为${mixingKey}的响应`);
 
       const response = buildPureResponse(ctx[mixingKey]);
       newRequestBody[mixingKey] = response;

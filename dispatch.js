@@ -19,7 +19,7 @@ app.use(
   mixinProxy({
     target: "http://localhost:8080",
     key: "isvRes",
-    mixingKeys: "mainRes"
+    mixinKeys: "mainRes"
   })
 );
 
