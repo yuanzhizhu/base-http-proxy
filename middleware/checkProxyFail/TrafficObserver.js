@@ -1,8 +1,9 @@
 class TrafficObserver {
-  constructor() {
-    this.totalReq = 0;
-    this.liveTotalReq = 0;
-    this.lastUpdateReqNumber = new Date().getTime();
+  constructor(ctx) {
+    this.ctx = ctx;
+    this.totalHttp = 0;
+    this.totalHttpIng = 0;
+    this.lastUpdate = new Date().getTime();
   }
 
   /**
@@ -10,20 +11,20 @@ class TrafficObserver {
    * 当前 n >= 10个/秒，即算是高并发
    */
   checkIsHighConcurrency() {
-    this.liveTotalReq++;
+    this.totalHttpIng++;
     const now = new Date().getTime();
-    const timeDiff = now - this.lastUpdateReqNumber;
+    const timeDiff = now - this.lastUpdate;
 
     if (timeDiff >= 2000) {
-      this.totalReq = this.liveTotalReq;
-      this.lastUpdateReqNumber = now;
+      this.totalHttp = this.totalHttpIng;
+      this.lastUpdate = now;
     } else if (timeDiff < 2000 && timeDiff >= 1000) {
-      const totalReqDiff = this.liveTotalReq - this.totalReq;
-      this.totalReq = this.liveTotalReq;
-      this.lastUpdateReqNumber = now;
+      const totalHttpDiff = this.totalHttpIng - this.totalHttp;
+      this.totalHttp = this.totalHttpIng;
+      this.lastUpdate = now;
 
-      if (totalReqDiff / timeDiff >= 5) {
-        this.onHighConcurrency && this.onHighConcurrency(totalReqDiff);
+      if (totalHttpDiff / timeDiff >= 5) {
+        this.onHighConcurrency && this.onHighConcurrency(totalHttpDiff);
       }
     }
   }

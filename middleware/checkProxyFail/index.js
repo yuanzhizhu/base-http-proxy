@@ -1,17 +1,17 @@
-const ReqHealth = require("./ReqHealth");
-const { HEALTH, HALF_HEALTH, UNHEALTH } = ReqHealth;
+const HttpHealth = require("./HttpHealth");
 
-const reqHealthMap = {};
+const httpHealthMap = {};
 
 const checkProxyFail = () => async (ctx, next) => {
   let isSuccess = true;
 
-  const { host, path } = ctx.request;
-  const key = `${host}/${path}`;
-  if (reqHealthMap[key] === undefined) {
-    reqHealthMap[key] = new ReqHealth();
-  }
-  const $ReqHealth = reqHealthMap[key];
+  const key = `${ctx.request.host}/${ctx.request.path}`;
+
+  const $HttpHealth = (httpHealthMap[key] = httpHealthMap[key]
+    ? httpHealthMap[key]
+    : new HttpHealth(ctx));
+
+  $HttpHealth.checkHealth();
 
   try {
     await next();
@@ -19,9 +19,7 @@ const checkProxyFail = () => async (ctx, next) => {
     isSuccess = false;
   }
 
-  const status = $ReqHealth.getStatus();
-
-  ctx.reqHealthMap = reqHealthMap;
+  $HttpHealth.saveHttpStatus({ isSuccess });
 };
 
 module.exports = checkProxyFail;
