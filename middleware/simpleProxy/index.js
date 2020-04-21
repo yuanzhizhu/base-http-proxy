@@ -7,11 +7,11 @@ const proxy = httpProxy.createProxyServer();
  * 简单proxy
  * 把proxy结果，塞入ctx[key]中
  */
-const simpleProxy = ({ target, key }) => async (ctx, next) => {
+const simpleProxy = ({ target, key, proxyTimeout }) => async (ctx, next) => {
   if (!target) throw new Error("target必传");
   if (!key) throw new Error("key必传");
 
-  await new Promise(resolve => {
+  await new Promise((resolve, reject) => {
     proxy.on("proxyRes", proxyRes => {
       let body = [];
 
@@ -34,11 +34,16 @@ const simpleProxy = ({ target, key }) => async (ctx, next) => {
 
     let rawBody = ctx.request.rawBody;
 
+    proxy.on("error", e => {
+      reject(e);
+    });
+
     proxy.web(ctx.req, ctx.res, {
       target,
       changeOrigin: true,
       selfHandleResponse: true,
-      buffer: rawBody ? streamify([rawBody]) : undefined
+      buffer: rawBody ? streamify([rawBody]) : undefined,
+      proxyTimeout
     });
   });
 

@@ -7,7 +7,10 @@ const proxy = httpProxy.createProxyServer();
 /**
  * 混合代理
  */
-const mixinProxy = ({ target, key, mixinKeys }) => async (ctx, next) => {
+const mixinProxy = ({ target, key, mixinKeys, proxyTimeout }) => async (
+  ctx,
+  next
+) => {
   if (!target) throw new Error("target必传");
   if (!key) throw new Error("key必传");
   if (!mixinKeys) throw new Error("mixinKeys必传");
@@ -16,7 +19,7 @@ const mixinProxy = ({ target, key, mixinKeys }) => async (ctx, next) => {
     mixinKeys = [mixinKeys];
   }
 
-  await new Promise(resolve => {
+  await new Promise((resolve, reject) => {
     proxy.on("proxyRes", proxyRes => {
       let body = [];
 
@@ -42,7 +45,10 @@ const mixinProxy = ({ target, key, mixinKeys }) => async (ctx, next) => {
     };
 
     for (let mixingKey of mixinKeys) {
-      if (!ctx[mixingKey]) throw new Error(`key为${key}的mixinProxy，找不到mixinKeys为${mixingKey}的响应`);
+      if (!ctx[mixingKey])
+        throw new Error(
+          `key为${key}的mixinProxy，找不到mixinKeys为${mixingKey}的响应`
+        );
 
       const response = buildPureResponse(ctx[mixingKey]);
       newRequestBody[mixingKey] = response;
@@ -59,11 +65,16 @@ const mixinProxy = ({ target, key, mixinKeys }) => async (ctx, next) => {
       proxyReq.setHeader("Content-Length", newRequestBodyLen);
     });
 
+    proxy.on("error", e => {
+      reject(e);
+    });
+
     proxy.web(ctx.req, ctx.res, {
       target,
       changeOrigin: true,
       selfHandleResponse: true,
-      buffer: streamify([newRequestBody])
+      buffer: streamify([newRequestBody]),
+      proxyTimeout
     });
   });
 
