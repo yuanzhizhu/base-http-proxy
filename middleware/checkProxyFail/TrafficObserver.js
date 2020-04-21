@@ -7,10 +7,10 @@ class TrafficObserver {
   }
 
   /**
-   * 检测是否是高并发
-   * 当前 n >= 10个/秒，即算是高并发
-   */
-  checkIsHighConcurrency() {
+   * 流量统计函数
+   * 一个必须被调用到的函数
+  */
+  recodeTraffic() {
     this.totalHttpIng++;
     const now = new Date().getTime();
     const timeDiff = now - this.lastUpdate;

@@ -11,7 +11,7 @@ const checkProxyFail = () => async (ctx, next) => {
     ? httpHealthMap[key]
     : new HttpHealth(ctx));
 
-  $HttpHealth.checkHealth();
+  $HttpHealth.checkHealthBeforeProxy();
 
   try {
     await next();
@@ -19,7 +19,7 @@ const checkProxyFail = () => async (ctx, next) => {
     isSuccess = false;
   }
 
-  $HttpHealth.saveHttpStatus({ isSuccess });
+  $HttpHealth.saveHttpStatusAfterProxy({ isSuccess });
 };
 
 module.exports = checkProxyFail;
