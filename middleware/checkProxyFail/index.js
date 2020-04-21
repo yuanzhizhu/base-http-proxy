@@ -18,7 +18,6 @@ const checkProxyFail = () => async (ctx, next) => {
   } catch (e) {
     if (e instanceof HttpUnhealthError) {
       ctx.body = e.message;
-      return;
     }
     isSuccess = false;
   }

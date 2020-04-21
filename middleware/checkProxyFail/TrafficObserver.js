@@ -9,7 +9,7 @@ class TrafficObserver {
   /**
    * 流量统计函数
    * 一个必须被调用到的函数
-  */
+   */
   recodeTraffic() {
     this.totalHttpIng++;
     const now = new Date().getTime();
@@ -23,7 +23,8 @@ class TrafficObserver {
       this.totalHttp = this.totalHttpIng;
       this.lastUpdate = now;
 
-      if (totalHttpDiff / timeDiff >= 5) {
+      console.log("两次大于1秒小于2秒");
+      if (totalHttpDiff / (timeDiff / 1000) >= 5) {
         this.onHighConcurrency && this.onHighConcurrency(totalHttpDiff);
       }
     }
