@@ -1,4 +1,5 @@
 const TrafficObserver = require("./TrafficObserver");
+const HttpUnhealthError = require("../HttpUnhealthError");
 
 const HEALTH = Symbol("health");
 const HALF_HEALTH = Symbol("half_health");
@@ -22,7 +23,7 @@ class HttpHealth extends TrafficObserver {
    * 熔断所有请求
    */
   breakAll() {
-    this.ctx.body = "请求超时，请稍后再试";
+    throw new HttpUnhealthError("请求超时，请稍后再试");
   }
 
   /**
@@ -30,7 +31,7 @@ class HttpHealth extends TrafficObserver {
    */
   startThrottleHttp() {
     if (this.throttling) {
-      this.ctx.body = "请求超时，请稍后再试";
+      throw new HttpUnhealthError("请求超时，请稍后再试");
     }
     this.throttling = true;
   }

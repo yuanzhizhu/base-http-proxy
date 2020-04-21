@@ -1,6 +1,7 @@
 const httpProxy = require("http-proxy");
 const streamify = require("stream-array");
 const buildPureResponse = require("./buildPureResponse");
+const HttpUnhealthError = require("../HttpUnhealthError");
 
 const proxy = httpProxy.createProxyServer();
 
@@ -65,8 +66,8 @@ const mixinProxy = ({ target, key, mixinKeys, proxyTimeout }) => async (
       proxyReq.setHeader("Content-Length", newRequestBodyLen);
     });
 
-    proxy.on("error", e => {
-      reject(e);
+    proxy.on("error", () => {
+      reject(new HttpUnhealthError("请求超时，请稍后再试"));
     });
 
     proxy.web(ctx.req, ctx.res, {

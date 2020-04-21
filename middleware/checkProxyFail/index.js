@@ -1,4 +1,5 @@
 const HttpHealth = require("./HttpHealth");
+const HttpUnhealthError = require("../HttpUnhealthError");
 
 const httpHealthMap = {};
 
@@ -11,11 +12,14 @@ const checkProxyFail = () => async (ctx, next) => {
     ? httpHealthMap[key]
     : new HttpHealth(ctx));
 
-  $HttpHealth.checkHealthBeforeProxy();
-
   try {
+    $HttpHealth.checkHealthBeforeProxy();
     await next();
   } catch (e) {
+    if (e instanceof HttpUnhealthError) {
+      ctx.body = e.message;
+      return;
+    }
     isSuccess = false;
   }
 
