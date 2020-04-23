@@ -68,7 +68,6 @@ class HttpHealth extends TrafficObserver {
    * @param isSuccess - 本次链路成功与否
    */
   saveHttpIsSuccessAfterProxy({ isSuccess }) {
-    console.log(this.status, '保存状态');
     if (isSuccess === undefined)
       throw new Error("saveHttpIsSuccessAfterProxy()必须传isSuccess参数");
 

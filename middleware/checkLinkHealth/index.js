@@ -17,6 +17,7 @@ const checkLinkHealth = () => async (ctx, next) => {
       $HttpHealth.saveHttpIsSuccessAfterProxy({ isSuccess: true });
     } catch (e) {
       $HttpHealth.saveHttpIsSuccessAfterProxy({ isSuccess: false });
+      throw new Error("代理链路异常");
     }
   } catch (e) {
     if (e instanceof HttpUnhealthError) {
