@@ -23,7 +23,6 @@ class TrafficObserver {
       this.totalHttp = this.totalHttpIng;
       this.lastUpdate = now;
 
-      console.log("两次大于1秒小于2秒");
       if (totalHttpDiff / (timeDiff / 1000) >= 5) {
         this.onHighConcurrency && this.onHighConcurrency(totalHttpDiff);
       }

@@ -49,14 +49,16 @@ class HttpHealth extends TrafficObserver {
   checkHealthBeforeProxy() {
     if (this.status === UNHEALTH) {
       if (new Date().getTime() - this.breakTime > 30000) {
-        console.log("进入半熔断");
+        console.log("熔断 => 半熔断");
         this.becomeHalfHealth();
+        console.log("半熔断中，开始节流");
         this.startThrottleHttp();
       } else {
-        console.log("熔断中");
+        console.log("熔断中...");
         this.breakAll();
       }
     } else if (this.status === HALF_HEALTH) {
+      console.log("半熔断中，开始节流");
       this.startThrottleHttp();
     }
   }
@@ -75,18 +77,17 @@ class HttpHealth extends TrafficObserver {
 
     if (this.status === HALF_HEALTH) {
       this.stopThrottleHttp();
-
-      console.log('刚刚完成一条半熔断测试');
+      console.log("刚刚放过一条测试http请求，测试是否恢复");
 
       if (isSuccess) {
         this.continueSuccess++;
-        console.log(`连续成功${this.continueSuccess}次`);
+        console.log(`连续成功${this.continueSuccess}次ttp请求测试`);
         if (this.continueSuccess === 2) {
-          console.log(`从半熔断恢复`);
+          console.log(`半熔断 => 正常`);
           this.becomeHealth();
         }
       } else {
-        console.log(`从半熔断掉回熔断`);
+        console.log(`半熔断 => 熔断`);
         this.becomeUnhealth();
       }
     }
@@ -125,13 +126,13 @@ class HttpHealth extends TrafficObserver {
    * 高并发时，触发该监听
    */
   onHighConcurrency(totalHttpDiff) {
-    console.log('进入高并发状态');
+    console.log("高并发状态中...");
     if (this.status === HEALTH) {
       const failHttpDiff = this.failHttpIng - this.failHttp;
       this.failHttpIng = this.failHttp;
 
       if (failHttpDiff / totalHttpDiff > 0.3) {
-        console.log("熔断");
+        console.log("正常 => 熔断");
         this.becomeUnhealth();
       }
     }
