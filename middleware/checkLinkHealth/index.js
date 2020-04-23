@@ -1,11 +1,9 @@
 const HttpHealth = require("./HttpHealth");
-const HttpUnhealthError = require("../HttpUnhealthError");
+const HttpUnhealthError = require("./HttpUnhealthError");
 
 const httpHealthMap = {};
 
-const checkProxyFail = () => async (ctx, next) => {
-  let isSuccess = true;
-
+const checkLinkHealth = () => async (ctx, next) => {
   const key = `${ctx.request.host}/${ctx.request.path}`;
 
   const $HttpHealth = (httpHealthMap[key] = httpHealthMap[key]
@@ -14,15 +12,19 @@ const checkProxyFail = () => async (ctx, next) => {
 
   try {
     $HttpHealth.checkHealthBeforeProxy();
-    await next();
+    try {
+      await next();
+      $HttpHealth.saveHttpIsSuccessAfterProxy({ isSuccess: true });
+    } catch (e) {
+      $HttpHealth.saveHttpIsSuccessAfterProxy({ isSuccess: false });
+    }
   } catch (e) {
     if (e instanceof HttpUnhealthError) {
       ctx.body = e.message;
+    } else {
+      ctx.body = "代理链路异常";
     }
-    isSuccess = false;
   }
-
-  $HttpHealth.saveHttpStatusAfterProxy({ isSuccess });
 };
 
-module.exports = checkProxyFail;
+module.exports = checkLinkHealth;

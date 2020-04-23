@@ -1,8 +1,6 @@
 const httpProxy = require("http-proxy");
 const streamify = require("stream-array");
-const HttpUnhealthError = require("../HttpUnhealthError");
-
-const proxy = httpProxy.createProxyServer();
+const ProxyError = require("../ProxyError");
 
 /**
  * 简单proxy
@@ -11,6 +9,8 @@ const proxy = httpProxy.createProxyServer();
 const simpleProxy = ({ target, key, proxyTimeout }) => async (ctx, next) => {
   if (!target) throw new Error("target必传");
   if (!key) throw new Error("key必传");
+
+  const proxy = httpProxy.createProxyServer();
 
   await new Promise((resolve, reject) => {
     proxy.on("proxyRes", proxyRes => {
@@ -36,7 +36,7 @@ const simpleProxy = ({ target, key, proxyTimeout }) => async (ctx, next) => {
     let rawBody = ctx.request.rawBody;
 
     proxy.on("error", () => {
-      reject(new HttpUnhealthError("请求超时，请稍后再试"));
+      reject(new ProxyError("代理超时或发生错误，请稍后重试"));
     });
 
     proxy.web(ctx.req, ctx.res, {
@@ -47,6 +47,8 @@ const simpleProxy = ({ target, key, proxyTimeout }) => async (ctx, next) => {
       proxyTimeout
     });
   });
+
+  proxy.close();
 
   await next();
 };

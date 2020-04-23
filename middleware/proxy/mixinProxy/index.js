@@ -1,9 +1,7 @@
 const httpProxy = require("http-proxy");
 const streamify = require("stream-array");
 const buildPureResponse = require("./buildPureResponse");
-const HttpUnhealthError = require("../HttpUnhealthError");
-
-const proxy = httpProxy.createProxyServer();
+const ProxyError = require("../ProxyError");
 
 /**
  * 混合代理
@@ -19,6 +17,8 @@ const mixinProxy = ({ target, key, mixinKeys, proxyTimeout }) => async (
   if (typeof mixinKeys === "string") {
     mixinKeys = [mixinKeys];
   }
+
+  const proxy = httpProxy.createProxyServer();
 
   await new Promise((resolve, reject) => {
     proxy.on("proxyRes", proxyRes => {
@@ -67,7 +67,7 @@ const mixinProxy = ({ target, key, mixinKeys, proxyTimeout }) => async (
     });
 
     proxy.on("error", () => {
-      reject(new HttpUnhealthError("请求超时，请稍后再试"));
+      reject(new ProxyError("代理超时或发生错误，请稍后重试"));
     });
 
     proxy.web(ctx.req, ctx.res, {
@@ -78,6 +78,8 @@ const mixinProxy = ({ target, key, mixinKeys, proxyTimeout }) => async (
       proxyTimeout
     });
   });
+
+  proxy.close();
 
   await next();
 };

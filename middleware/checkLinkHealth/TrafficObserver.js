@@ -23,7 +23,7 @@ class TrafficObserver {
       this.totalHttp = this.totalHttpIng;
       this.lastUpdate = now;
 
-      if (totalHttpDiff / (timeDiff / 1000) >= 5) {
+      if (totalHttpDiff / (timeDiff / 1000) >= 2) {
         this.onHighConcurrency && this.onHighConcurrency(totalHttpDiff);
       }
     }

@@ -1,15 +1,14 @@
 const Koa = require("koa");
 const bodyParser = require("koa-bodyparser");
 
-const checkProxyFail = require("./middleware/checkProxyFail");
-const simpleProxy = require("./middleware/simpleProxy");
-const mixinProxy = require("./middleware/mixinProxy");
+const checkLinkHealth = require("./middleware/checkLinkHealth");
+const { simpleProxy, mixinProxy } = require("./middleware/proxy");
 
 const app = new Koa();
 
 app.use(bodyParser());
 
-app.use(checkProxyFail());
+app.use(checkLinkHealth());
 
 app.use(
   simpleProxy({

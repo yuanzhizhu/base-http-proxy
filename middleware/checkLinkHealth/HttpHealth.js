@@ -1,5 +1,5 @@
 const TrafficObserver = require("./TrafficObserver");
-const HttpUnhealthError = require("../HttpUnhealthError");
+const HttpUnhealthError = require("./HttpUnhealthError");
 
 const HEALTH = Symbol("health");
 const HALF_HEALTH = Symbol("half_health");
@@ -67,9 +67,10 @@ class HttpHealth extends TrafficObserver {
    * 保存请求状态
    * @param isSuccess - 本次链路成功与否
    */
-  saveHttpStatusAfterProxy({ isSuccess }) {
+  saveHttpIsSuccessAfterProxy({ isSuccess }) {
+    console.log(this.status, '保存状态');
     if (isSuccess === undefined)
-      throw new Error("saveHttpStatusAfterProxy()必须传isSuccess参数");
+      throw new Error("saveHttpIsSuccessAfterProxy()必须传isSuccess参数");
 
     if (isSuccess === false) {
       this.failHttpIng++;
