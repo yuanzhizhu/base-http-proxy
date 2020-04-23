@@ -20,6 +20,7 @@ const checkLinkHealth = () => async (ctx, next) => {
       throw new Error("代理链路异常");
     }
   } catch (e) {
+    ctx.response.status = 500;
     if (e instanceof HttpUnhealthError) {
       ctx.body = e.message;
     } else {

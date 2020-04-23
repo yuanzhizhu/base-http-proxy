@@ -6,7 +6,7 @@ const app = new Koa();
 app.use(bodyParser());
 app.use(async (ctx, next) => {
   const body = ctx.request.body;
-  const t = parseInt(Math.random() * 10000);
+  const t = parseInt(Math.random() * 3000);
   await new Promise((resolve) => {
     setTimeout(() => {
       resolve();
