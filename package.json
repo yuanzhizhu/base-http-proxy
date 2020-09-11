@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/yuanzhizhu/base-http-proxy#readme",
   "dependencies": {
-    "http-proxy": "^1.18.0",
+    "http-proxy": "^1.18.1",
     "koa": "^2.11.0",
     "koa-bodyparser": "^4.3.0",
     "stream-array": "^1.1.2"
